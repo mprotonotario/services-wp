@@ -1,0 +1,50 @@
+services:
+  # Laravel Web Service & Queue Worker
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_whatsapp_microservice
+    restart: always
+    ports:
+      - "8200:8000"
+    volumes:
+      - ./:/var/www
+      - /var/www/vendor
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=redis
+      - EVOLUTION_API_URL=http://evolution:8080
+      - EVOLUTION_API_KEY=${EVOLUTION_API_KEY}
+      - EVOLUTION_INSTANCE_NAME=${EVOLUTION_INSTANCE_NAME}
+    depends_on:
+      - redis
+      - evolution
+
+  # Redis for Queues
+  redis:
+    image: redis:alpine
+    container_name: whatsapp_redis
+    restart: always
+
+  # Evolution API Service
+  evolution:
+    image: evoapicloud/evolution-api:v1.8.2
+    container_name: whatsapp_evolution_api
+    restart: always
+    ports:
+      - "8800:8080"
+    environment:
+      # Evolution API basic configuration
+      - SERVER_PORT=8080
+      - DEL_INSTANCE_CLEANER=true
+      - DATABASE_ENABLED=false # Using local JSON files for simplicity, or change to true for PostgreSQL/MySQL
+      - AUTHENTICATION_API_KEY=apikey_global_aqui
+      - LANGUAGE=es
+    volumes:
+      - evolution_data:/evolution/instances
+
+volumes:
+  evolution_data:
