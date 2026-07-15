@@ -3,6 +3,14 @@
 # Clear bootstrap cache files to avoid package discovery issues from host volume mount
 rm -f bootstrap/cache/*.php
 
+# Ensure SQLite database file exists (it is often gitignored in production)
+mkdir -p database
+touch database/database.sqlite
+
+
+# Run database migrations
+php artisan migrate --force
+
 # Cache configuration for performance
 php artisan config:cache
 php artisan route:cache
