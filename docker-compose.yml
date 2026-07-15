@@ -41,7 +41,7 @@ services:
       - SERVER_PORT=8080
       - DEL_INSTANCE_CLEANER=true
       - DATABASE_ENABLED=false # Using local JSON files for simplicity, or change to true for PostgreSQL/MySQL
-      - AUTHENTICATION_API_KEY=apikey_global_aqui
+      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY}
       - LANGUAGE=es
     volumes:
       - evolution_data:/evolution/instances
