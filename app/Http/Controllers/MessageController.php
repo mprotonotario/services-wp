@@ -22,9 +22,18 @@ class MessageController extends Controller
             'message' => 'required|string|min:1',
         ]);
 
-        // Clean the number format if necessary (e.g. remove spaces, plus sign, etc.)
-        // Evolution API usually expects the number with the country code, without '+' or spaces.
+        // Clean the number format (remove non-digits like '+', spaces, etc.)
         $number = preg_replace('/[^0-9]/', '', $validated['number']);
+
+        // Normalización automática para números de México:
+        // 1. Si empieza con 521 y tiene 13 dígitos (formato obsoleto), remover el '1' intermedio
+        if (str_starts_with($number, '521') && strlen($number) === 13) {
+            $number = '52' . substr($number, 3);
+        }
+        // 2. Si solo tiene 10 dígitos, asumir que es de México y añadirle el prefijo de país 52
+        elseif (strlen($number) === 10) {
+            $number = '52' . $number;
+        }
 
         // Dispatch the job
         SendWhatsAppMessageJob::dispatch($number, $validated['message']);
