@@ -35,7 +35,12 @@ class SendWhatsAppMessageJob implements ShouldQueue
      */
     public function handle(EvolutionApiService $apiService): void
     {
-        Log::info("Iniciando envío de WhatsApp a {$this->number}. Aplicando lógica anti-bloqueo...");
+        // 0. Asegurar que la instancia marque los mensajes como leídos automáticamente y se mantenga online
+        $apiService->setSettings([
+            'read_messages' => true,
+            'always_online' => true,
+            'read_status' => true
+        ]);
 
         // 1. Retardo inicial aleatorio para simular pausa humana antes de interactuar (3 a 8 segundos)
         $initialDelay = rand(3, 8);

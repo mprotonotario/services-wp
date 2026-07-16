@@ -105,4 +105,36 @@ class EvolutionApiService
             return null;
         }
     }
+
+    /**
+     * Set instance settings (like read_messages, always_online, etc.)
+     *
+     * @param array $settings
+     * @return bool
+     */
+    public function setSettings(array $settings): bool
+    {
+        try {
+            $url = "{$this->baseUrl}/settings/set/{$this->instance}";
+
+            $response = Http::withHeaders([
+                'apikey' => $this->apiKey,
+                'Content-Type' => 'application/json',
+            ])->post($url, $settings);
+
+            if ($response->successful()) {
+                return true;
+            }
+
+            Log::error("Evolution API Set Settings failed", [
+                'status' => $response->status(),
+                'response' => $response->json(),
+            ]);
+
+            return false;
+        } catch (\Exception $e) {
+            Log::error("Evolution API Set Settings error: " . $e->getMessage());
+            return false;
+        }
+    }
 }
